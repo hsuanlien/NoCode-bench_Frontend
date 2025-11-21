@@ -1,38 +1,190 @@
+/* Make the app fill the viewport */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+/* Disable page scroll */
+body {
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 .App {
-  text-align: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.App-main {
+  flex: 1 1 auto;
+  display: flex;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Footer sticks near bottom visually */
+.app-footer {
+  flex: 0 0 auto;
+  margin-top: 1rem;
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-left: auto;
+  margin-right: 0.5rem;
+}
+
+.button {
+  padding: 1rem 2rem;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #5dabfd;
+  color: white;
+  cursor: pointer;
+}
+
+.buttonArea {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* The row with the two buttons stays fixed height */
+.buttonRow {
+  display: flex;
+  gap: 30px;
+  height: 80px;
+  align-items: center;
+}
+
+.buttonRow button {
+  flex: 1;
+  max-width: 220px;
+}
+
+.messageArea {
+  margin-top: 20px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Middle column: full-height, width between 1/3 and 1/2 */
+.midColumn {
+  min-height: 80vh;
+  min-width: 30%;
+  max-width: 50%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+/* Box that is vertically centered and leaves 2rem side margins */
+.repoBox {
+  width: calc(100% - 4rem);
+  margin: 0 2rem;
+  box-sizing: border-box;
+  border: 2px solid #61abfb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.repoBox button {
+  display: block;
+  margin: 1.5rem auto 0 auto;
+}
+
+.title {
+  width: calc(100% - 2rem);
+  margin: 0 1rem;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 1rem;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  line-height: 1.3;
+}
+
+.repoSelect {
+  display: block;
+  width: calc(100% - 2rem);
+  margin: 0 1rem;
+  padding: 0.5rem 0.75rem;
+  box-sizing: border-box;
+}
+
+.repoSelect option {
+  padding: 0.4rem;
+}
+
+.backButton {
+  align-self: flex-end;
+  margin-left: 1rem;
+  margin-top: 1rem;
+}
+
+.statusBox {
+  min-height: 80vh;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0 2rem;
+}
+
+.repoInfo {
+  margin-top: 1rem;
+  flex: 0 0 50%;             /* 50% vertical space */
+  display: flex;             /* place repoName and repoChanged side by side */
+  flex-direction: row;
+  gap: 1rem;  
+}
+
+.repoName,
+.repoChanged {
+  flex: 1;
+  border: 2px solid #000000;
+  border-radius: 0rem;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.statusInfo {
+  margin-bottom: 1rem;
+  flex: 0 0 30%;
+  border: 2px solid #61abfb;
+  border-radius: 0rem;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* RESPONSIVE BEHAVIOR (small screens) */
+@media (max-width: 768px) {
+  .app {
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .app-main {
+    flex-direction: column;
+    /* stack panels vertically */
+  }
+
+  .panel {
+    padding: 1rem;
+  }
+
+  .app-header {
+    text-align: center;
   }
 }
