@@ -1,0 +1,31 @@
+{
+  "tasks": [
+    {
+      "id": 2,
+      "result": {
+        "success_percent": 0.0,
+        "applied_percent": 100.0,
+        "rt_percent": 0.0,
+        "fv_macro": 0.0,
+        "file_percent": 50.0,
+        "num_token": 140,
+        "run_time_seconds": 384.533568,
+        "f2p_passed_count": 0,
+        "f2p_total_count": 2,
+        "generated_patch": "diff --git _pytest/config.py _pytest/config.py\nindex 2f28bb7bf..efaedad27 100644\n--- _pytest/config.py\n+++ _pytest/config.py\n@@ -105,7 +105,7 @@ default_plugins = (\n     \"mark main terminal runner python fixtures debugging unittest capture skipping \"\n     \"tmpdir monkeypatch recwarn pastebin helpconfig nose assertion \"\n     \"junitxml resultlog doctest cacheprovider freeze_support \"\n-    \"setuponly setupplan warnings\").split()\n+    \"setuponly setupplan warnings logging\").split()\n \n \n builtin_plugins = set(default_plugins)\n@@ -1392,4 +1392,4 @@ def _strtobool(val):\n     elif val in ('n', 'no', 'f', 'false', 'off', '0'):\n         return 0\n     else:\n-        raise ValueError(\"invalid truth value %r\" % (val,))\n+        raise ValueError(\"invalid truth value %r\" % (val,))\n\\ No newline at end of file\ndiff --git _pytest/terminal.py _pytest/terminal.py\nindex 92f319766..0ea9d7c30 100644\n--- _pytest/terminal.py\n+++ _pytest/terminal.py\n@@ -660,4 +660,4 @@ def _plugin_nameversions(plugininfo):\n         # they can have more than one plugin\n         if name not in l:\n             l.append(name)\n-    return l\n+    return l\n\\ No newline at end of file\n"
+      },
+      "base_task_id": null,
+      "nocode_bench_id": "pytest-dev__pytest-2794",
+      "doc_change_input": " 同上 ",
+      "ground_truth_patch": "",
+      "feature_test_patch": " ",
+      "f2p_test_names": [],
+      "p2p_test_names": [],
+      "status": "FAILED_TEST",
+      "celery_task_id": "0e37feb4-0940-48ed-bca4-2a8ca4ac7d99",
+      "start_time": "2025-11-08T14:52:37.084215Z",
+      "end_time": "2025-11-08T15:12:58.373103Z",
+      "error_details": null
+    }
+  ]
+}

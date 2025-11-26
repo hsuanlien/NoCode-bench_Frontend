@@ -1,0 +1,21 @@
+/* App.css */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #020617; /* 跟整體風格一致的深色背景 */
+}
+
+.App-main {
+  flex: 1;
+}
+
+/* footer 簡單做一條在下面即可 */
+.app-footer {
+  text-align: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  background: #020617;
+  border-top: 1px solid rgba(148, 163, 184, 0.3);
+}
