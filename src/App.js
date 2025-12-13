@@ -9,11 +9,6 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        {/* Navigation */}
-        {/* <nav>
-          <Link to="/">Home</Link> |{" "}
-          <Link to="/chooseRepo">chooseRepo</Link>
-        </nav> */}
         <main className="App-main">
           {/* Routes */}
           <Routes>

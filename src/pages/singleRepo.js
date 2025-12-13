@@ -1,50 +1,54 @@
 // src/SingleRepo.js
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/NoCodeBench.css";
-
-const repoOptions = [
-  {
-    id: "apple",
-    name: "apple/nocode-doc-patch",
-    description:
-      "A sample repository where agents apply documentation-driven patches to a TypeScript codebase.",
-    language: "TypeScript",
-    stars: "3.2k",
-    lastRun: "Last run: 5 mins ago",
-  },
-  {
-    id: "banana",
-    name: "banana/agent-eval-playground",
-    description:
-      "Multi-task benchmark with unit tests focused on refactoring and behavior-preserving edits.",
-    language: "Python",
-    stars: "1.1k",
-    lastRun: "Last run: 2 hours ago",
-  },
-  {
-    id: "orange",
-    name: "orange/regression-guard-suite",
-    description:
-      "Stress tests for agents applying doc changes across monorepo modules with CI integration.",
-    language: "Monorepo (mix)",
-    stars: "890",
-    lastRun: "No runs yet",
-  },
-];
 
 const SingleRepo = () => {
   const navigate = useNavigate();
-  const [selectedRepo, setSelectedRepo] = useState(repoOptions[0].id);
+  const [pullRequests, setPullRequests] = useState([]);
+  const [selectedRepo, setSelectedRepo] = useState(null);
+
+  const API_BASE = process.env.REACT_APP_API_BASE ?? "http://localhost:3001";
 
   const handleConfirm = async () => {
-    // 日後要打 backend 的話，可以在這裡用 selectedRepo 呼叫 API
-    // 現在先維持原本行為：直接跳 statusAnalytics
-    navigate("/statusAnalytics");
+    if (!selectedRepo) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base_nocode_bench_id: selectedRepo }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Backend error ${res.status}: ${text}`);
+      }
+      console.log("Evaluation started successfully");
+
+      const result = await res.json();
+      navigate("/statusAnalytics");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to start evaluation. Check console.");
+    }
   };
 
-  const currentRepo =
-    repoOptions.find((repo) => repo.id === selectedRepo) || repoOptions[0];
+  useEffect(() => {
+    fetch("requestOptions.json")
+      .then(res => res.json())
+      .then(data => {
+        setPullRequests(data.pullRequests);
+        setSelectedRepo(data.pullRequests?.[0]?.instance_id ?? null);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }, []);
+
+  const currentRepo = pullRequests.find((r) => r.instance_id === selectedRepo) ?? pullRequests[0] ?? null;
+  if (!currentRepo) return <div>Loading…</div>;
+
 
   return (
     <div className="page single-repo-page">
@@ -59,8 +63,8 @@ const SingleRepo = () => {
             </p>
             <h2 className="choose-title">Choose a benchmark repository</h2>
             <p className="choose-subtitle">
-              Pick a single repository from your NoCode-bench collection to
-              run an evaluation. Each repo comes with documentation changes and
+              Pick a single Pull Request from the NoCode-bench dataset to
+              run an evaluation. Each request comes with documentation changes and
               test suites.
             </p>
           </div>
@@ -70,21 +74,16 @@ const SingleRepo = () => {
         <div className="single-layout">
           {/* 左邊：repo 列表 */}
           <div className="repo-list">
-            {repoOptions.map((repo) => (
+            {pullRequests.map((repo) => (
               <button
-                key={repo.id}
-                className={`repo-list-item ${
-                  repo.id === selectedRepo ? "selected" : ""
-                }`}
-                onClick={() => setSelectedRepo(repo.id)}
+                key={repo.instance_id}
+                className={`repo-list-item ${repo.instance_id === selectedRepo ? "selected" : ""
+                  }`}
+                onClick={() => setSelectedRepo(repo.instance_id)}
               >
                 <div className="repo-list-main">
-                  <p className="repo-list-name">{repo.name}</p>
-                  <p className="repo-list-desc">{repo.description}</p>
-                </div>
-                <div className="repo-list-meta">
-                  <span className="repo-tag">{repo.language}</span>
-                  <span className="repo-tag subtle">⭐ {repo.stars}</span>
+                  <p className="repo-list-name">{repo.repo}</p>
+                  <p className="repo-list-desc">{repo.case_number}</p>
                 </div>
               </button>
             ))}
@@ -94,22 +93,23 @@ const SingleRepo = () => {
           <aside className="repo-detail">
             <div className="repo-detail-header">
               <span className="repo-badge">Selected repo</span>
-              <h3 className="repo-detail-name">{currentRepo.name}</h3>
+              <h3 className="repo-detail-name">{currentRepo.instance_id}</h3>
             </div>
             <div className="repo-detail-body">
-              <p className="repo-detail-desc">{currentRepo.description}</p>
+              <p className="repo-detail-name">{currentRepo.title}</p>
+              <p className="repo-detail-desc">{currentRepo.url}</p>
               <div className="repo-detail-grid">
                 <div>
-                  <span className="repo-detail-label">Primary language</span>
-                  <p className="repo-detail-value">{currentRepo.language}</p>
+                  <span className="repo-detail-label">Conversation</span>
+                  <p className="repo-detail-value">{currentRepo.conversation}</p>
                 </div>
                 <div>
-                  <span className="repo-detail-label">Stars</span>
-                  <p className="repo-detail-value">{currentRepo.stars}</p>
+                  <span className="repo-detail-label">Commits</span>
+                  <p className="repo-detail-value">{currentRepo.commits}</p>
                 </div>
                 <div>
-                  <span className="repo-detail-label">Status</span>
-                  <p className="repo-detail-value">{currentRepo.lastRun}</p>
+                  <span className="repo-detail-label">Checks</span>
+                  <p className="repo-detail-value">{currentRepo.checks}</p>
                 </div>
               </div>
             </div>
@@ -123,7 +123,7 @@ const SingleRepo = () => {
               <button className="btn btn-primary" onClick={handleConfirm}>
                 <span className="btn-main-text">Run evaluation</span>
                 <span className="btn-sub-text">
-                  Use this repo and go to status
+                  Use this Pull Request and go to status
                 </span>
               </button>
             </div>

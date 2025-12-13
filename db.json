@@ -1,13 +1,13 @@
 {
   "tasks": [
     {
-      "id": 2,
+      "id": "2",
       "result": {
-        "success_percent": 0.0,
-        "applied_percent": 100.0,
-        "rt_percent": 0.0,
-        "fv_macro": 0.0,
-        "file_percent": 50.0,
+        "success_percent": 0,
+        "applied_percent": 100,
+        "rt_percent": 0,
+        "fv_macro": 0,
+        "file_percent": 50,
         "num_token": 140,
         "run_time_seconds": 384.533568,
         "f2p_passed_count": 0,

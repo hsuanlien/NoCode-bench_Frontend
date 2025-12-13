@@ -20,6 +20,7 @@ const ChooseRepo = () => {
       fileInputRef.current.value = "";
       fileInputRef.current.click();
     }
+    navigate("/api/tasks/run-custom-repo");
   };
 
   const validateFile = (file) => {
