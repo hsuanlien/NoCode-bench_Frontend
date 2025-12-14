@@ -452,6 +452,16 @@ body {
   color: var(--nc-accent);
 }
 
+.repo-input {
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0. ninerem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.12s ease;
+}
+
 /* footer messages */
 .choose-footer {
   border-top: 1px solid rgba(148, 163, 184, 0.4);

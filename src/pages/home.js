@@ -32,12 +32,15 @@ const Home = () => {
               automatically implement the corresponding code updates — until
               your project tests turn green.
             </p>
+            <p className="home-subtitle">
+              This tool lets you either choose from curated real-world feature addition tasks from the NoCode-bench Verified dataset or upload your own GitHub repository and specify natural-language instructions for modifying code. Behind the scenes, we use benchmark principles from NoCode-bench to guide how edits are validated and analyzed.
+            </p>
           </div>
 
           <div className="home-actions">
             <button className="btn btn-primary" onClick={handleStart}>
-              <span className="btn-main-text">Choose repository</span>
-              <span className="btn-sub-text">Start an evaluation run</span>
+              <span className="btn-main-text">Define a Feature Addition Task</span>
+              <span className="btn-sub-text">Specify a repository and a natural-language change request</span>
             </button>
 
             <div className="home-meta">

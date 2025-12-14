@@ -1,52 +1,82 @@
 // src/ChooseRepo.js
 import { useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import "../styles/NoCodeBench.css";
+
+function isValidHttpUrl(value) {
+  if (!value) return false;
+
+  // parsing check
+  try {
+    const url = new URL(value);
+
+    if (!["http:", "https:"].includes(url.protocol)) return false;
+
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const ChooseRepo = () => {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+  const [manifestUrl, setManifestUrl] = useState("");
+  const [manifestNote, setManifestNote] = useState("");
+  const [urlTouched, setUrlTouched] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitOk, setSubmitOk] = useState(false);
 
-  const [error, setError] = useState("");
-  const [status, setStatus] = useState("");
+  const isUrlValid = useMemo(
+    () => isValidHttpUrl(manifestUrl.trim()),
+    [manifestUrl]
+  );
 
-  const allowedExtensions = [".csv", ".json", ".js"];
+  const API_BASE = process.env.REACT_APP_API_BASE ?? "http://localhost:3001";
 
-  const handleUploadClick = () => {
-    setError("");
-    setStatus("");
+  const handleConfirm = async () => {
+    setSubmitError("");
+    setSubmitOk(false);
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-      fileInputRef.current.click();
-    }
-    navigate("/api/tasks/run-custom-repo");
-  };
-
-  const validateFile = (file) => {
-    if (!file) return "Please choose a file.";
-
-    const name = file.name.toLowerCase();
-    const ok = allowedExtensions.some((ext) => name.endsWith(ext));
-    if (!ok) {
-      return `Only ${allowedExtensions.join(", ")} files are allowed.`;
-    }
-    return "";
-  };
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    const validationError = validateFile(file);
-
-    if (validationError) {
-      setError(validationError);
-      setStatus("");
+    const url = manifestUrl.trim();
+    if (!isValidHttpUrl(url)) {
+      setSubmitError("Please enter a valid http(s) URL.");
       return;
     }
 
-    // 原本就有的流程：檔案 OK -> 進到 /statusAnalytics
-    navigate("/statusAnalytics");
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(`${API_BASE}/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          github_url: url,
+          doc_change: manifestNote.trim() || manifestNote,
+        }),
+      });
+
+      if (!res.ok) {
+        // try to read server error message if it returns JSON/text
+        let msg = `Request failed (${res.status})`;
+        try {
+          const data = await res.json();
+          msg = data?.message || data?.error || msg;
+        } catch {
+          // ignore
+        }
+        throw new Error(msg);
+      }
+
+      setSubmitOk(true);
+      navigate("/statusAnalytics");
+    } catch (e) {
+      setSubmitError(e.message || "Failed to submit.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
 
   return (
     <div className="page choose-repo-page">
@@ -59,13 +89,12 @@ const ChooseRepo = () => {
             <p className="breadcrumb" onClick={() => navigate("/")}>
               ⬅ Back to Home
             </p>
-            <h2 className="choose-title">Select a repository</h2>
+            <h2 className="choose-title">Specify a Feature Addition Task</h2>
             <p className="choose-subtitle">
-              Start by picking a single repo from your bench, or upload a
-              manifest file that describes multiple projects.
+              Select a repository and provide a natural-language description of the intended feature change. The system will generate and analyze corresponding code modifications.
             </p>
           </div>
-          <div className="choose-chip">Step 1 · Repository source</div>
+          <div className="choose-chip">Step 1 · Task specification</div>
         </header>
 
         <div className="choose-options">
@@ -74,55 +103,70 @@ const ChooseRepo = () => {
             onClick={() => navigate("/singleRepo")}
           >
             <div className="repo-icon">📁</div>
-            <h3 className="repo-title">Single repository</h3>
+            <h3 className="repo-title">Use Built-in Verified Tasks</h3>
+            <div></div>
             <p className="repo-desc">
-              Browse a list of benchmark repos and run an evaluation on one
-              project.
+              Select a real software feature-addition task drawn from the NoCode-bench Verified subset — manually validated instances where documentation changes clearly map to code edits and verification tests.
             </p>
-            <span className="repo-cta">Choose from list →</span>
+            <span className="repo-cta">Pick a task to see how automated editing compares to expected outcomes →</span>
           </button>
 
-          <button className="repo-card" onClick={handleUploadClick}>
-            <div className="repo-icon">⬆️</div>
-            <h3 className="repo-title">Upload manifest</h3>
-            <p className="repo-desc">
-              Upload a <code>.csv</code>, <code>.json</code>, or{" "}
-              <code>.js</code> file that describes multiple repositories and
-              tasks.
-            </p>
-            <span className="repo-cta">Select file →</span>
-          </button>
+          <div>
+            <div className="repo-card" style={{ cursor: "default" }}>
+              <div className="repo-icon">🔗</div>
+              <h3 className="repo-title">Upload a GitHub Repo & Use Custom Instruction</h3>
+              <p className="repo-desc">
+                Enter the URL of a GitHub repository and a natural-language command describing how you want files modified. Our engine will Analyze the repository structure, Generate code edits based on your instruction, and Present the modified code with analysis. This follows the same feature addition evaluation principles used in NoCode-bench: editorial clarity, code correctness, and result coverage.
+              </p>
+              <span className="repo-cta">{isUrlValid ? "Enter the command. Be specific — the more precise your instruction, the better the model can locate relevant files and generate correct edits." : "Enter a GitHub URL"}</span>
 
-          {/* hidden file input */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept=".csv,.json,.js"
-            style={{ display: "none" }}
-          />
+              <input
+                className="repo-input"
+                type="url"
+                placeholder="https://github.com/example/example.git"
+                value={manifestUrl}
+                onChange={(e) => setManifestUrl(e.target.value)}
+                onBlur={() => setUrlTouched(true)}
+              />
+
+              {urlTouched && manifestUrl.trim() !== "" && !isUrlValid && (
+                <div className="repo-error">Please enter a valid URL.</div>
+              )}
+
+              {isUrlValid && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <input
+                    className="repo-input"
+                    type="text"
+                    placeholder="e.g., In the ... file, add a new variable 'x' and set it to 'Gemini'"
+                    value={manifestNote}
+                    onChange={(e) => setManifestNote(e.target.value)}
+                  />
+
+                  <div className="repo-detail-footer">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleConfirm}
+                      disabled={submitting || !isUrlValid}
+                    >
+                      <span className="btn-main-text">{submitting ? "Submitting..." : "Run Task Evaluation"}</span>
+                      <span className="btn-sub-text">
+                  Generate and analyze code edits for this request
+                </span>
+                    </button>
+                  </div>
+
+                  {submitError && <div className="repo-error">{submitError}</div>}
+                  {submitOk && <div className="repo-success">Submitted ✓</div>}
+                </div>
+              )}
+
+            </div>
+          </div>
         </div>
-
-        <footer className="choose-footer">
-          {error && (
-            <p className="message message-error">
-              <span>⚠</span> {error}
-            </p>
-          )}
-          {status && (
-            <p className="message message-success">
-              <span>✓</span> {status}
-            </p>
-          )}
-          {!error && !status && (
-            <p className="message message-muted">
-              Only <code>.csv</code>, <code>.json</code>, or{" "}
-              <code>.js</code> files are accepted for uploads.
-            </p>
-          )}
-        </footer>
       </div>
-    </div>
+    </div >
   );
 };
 
