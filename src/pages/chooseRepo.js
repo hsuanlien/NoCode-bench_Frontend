@@ -3,16 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useRef, useState, useMemo } from "react";
 import "../styles/NoCodeBench.css";
 
-function isValidHttpUrl(value) {
-  if (!value) return false;
+const API_BASE =
+  (process.env.REACT_APP_API_BASE ?? "").replace(/\/+$/, "") ||
+  "http://127.0.0.1:3001";
 
-  // parsing check
+function isValidHttpUrl(value) {
   try {
     const url = new URL(value);
-
-    if (!["http:", "https:"].includes(url.protocol)) return false;
-
-    return true;
+    return ["http:", "https:"].includes(url.protocol);
   } catch {
     return false;
   }
@@ -25,53 +23,60 @@ const ChooseRepo = () => {
   const [urlTouched, setUrlTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [submitOk, setSubmitOk] = useState(false);
+  // const [submitOk, setSubmitOk] = useState(false);
 
   const isUrlValid = useMemo(
     () => isValidHttpUrl(manifestUrl.trim()),
     [manifestUrl]
   );
 
-  const API_BASE = process.env.REACT_APP_API_BASE ?? "http://localhost:3001";
-
-  const handleConfirm = async () => {
+    const handleConfirm = async () => {
     setSubmitError("");
-    setSubmitOk(false);
 
-    const url = manifestUrl.trim();
-    if (!isValidHttpUrl(url)) {
-      setSubmitError("Please enter a valid http(s) URL.");
+    const github_url = manifestUrl.trim();
+    const doc_change = manifestNote.trim();
+
+    if (!isUrlValid) {
+      setSubmitError("Please enter a valid GitHub URL.");
+      return;
+    }
+    if (!doc_change) {
+      setSubmitError("Please enter a feature description.");
       return;
     }
 
     try {
       setSubmitting(true);
 
-      const res = await fetch(`${API_BASE}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          github_url: url,
-          doc_change: manifestNote.trim() || manifestNote,
-        }),
-      });
+      const res = await fetch(
+        `${API_BASE}/api/tasks/run-custom-repo/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ github_url, doc_change }),
+        }
+      );
 
       if (!res.ok) {
-        // try to read server error message if it returns JSON/text
-        let msg = `Request failed (${res.status})`;
-        try {
-          const data = await res.json();
-          msg = data?.message || data?.error || msg;
-        } catch {
-          // ignore
-        }
-        throw new Error(msg);
+        const text = await res.text();
+        throw new Error(`Backend error ${res.status}: ${text}`);
       }
 
-      setSubmitOk(true);
-      navigate("/statusAnalytics");
-    } catch (e) {
-      setSubmitError(e.message || "Failed to submit.");
+      const data = await res.json();
+
+      // 🔑 這就是你要記住的 taskId
+      const taskId = data.id;
+
+      // 保險：給 Status 用（支援重新整理）
+      localStorage.setItem("nocode_last_task_id", String(taskId));
+
+      // 跳轉到 status（和 SingleRepo 一模一樣）
+      navigate("/statusAnalytics", {
+        state: { taskId },
+      });
+    } catch (err) {
+      console.error(err);
+      setSubmitError(err.message || "Failed to submit task.");
     } finally {
       setSubmitting(false);
     }
@@ -96,7 +101,7 @@ const ChooseRepo = () => {
           </div>
           <div className="choose-chip">Step 1 · Task specification</div>
         </header>
-
+{/* 左邊 built-in task 保持不動 */}
         <div className="choose-options">
           <button
             className="repo-card"
@@ -110,7 +115,7 @@ const ChooseRepo = () => {
             </p>
             <span className="repo-cta">Pick a task to see how automated editing compares to expected outcomes →</span>
           </button>
-
+ {/* 右邊 custom repo */}
           <div>
             <div className="repo-card" style={{ cursor: "default" }}>
               <div className="repo-icon">🔗</div>
@@ -123,22 +128,25 @@ const ChooseRepo = () => {
               <input
                 className="repo-input"
                 type="url"
-                placeholder="https://github.com/example/example.git"
+                placeholder="https://github.com/user/repo.git"
                 value={manifestUrl}
                 onChange={(e) => setManifestUrl(e.target.value)}
                 onBlur={() => setUrlTouched(true)}
               />
 
-              {urlTouched && manifestUrl.trim() !== "" && !isUrlValid && (
+              {/* {urlTouched && manifestUrl.trim() !== "" && !isUrlValid && (
                 <div className="repo-error">Please enter a valid URL.</div>
-              )}
+              )} */}
+              {urlTouched && !isUrlValid && (
+              <div className="repo-error">Invalid URL.</div>
+            )}
 
               {isUrlValid && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   <input
                     className="repo-input"
                     type="text"
-                    placeholder="e.g., In the ... file, add a new variable 'x' and set it to 'Gemini'"
+                    placeholder="Describe the feature you want to add…"
                     value={manifestNote}
                     onChange={(e) => setManifestNote(e.target.value)}
                   />
@@ -148,9 +156,10 @@ const ChooseRepo = () => {
                       type="button"
                       className="btn btn-primary"
                       onClick={handleConfirm}
-                      disabled={submitting || !isUrlValid}
+                      disabled={submitting}
                     >
-                      <span className="btn-main-text">{submitting ? "Submitting..." : "Run Task Evaluation"}</span>
+                      <span className="btn-main-text">
+                        {submitting ? "Submitting..." : "Run Task Evaluation"}</span>
                       <span className="btn-sub-text">
                   Generate and analyze code edits for this request
                 </span>
@@ -158,7 +167,6 @@ const ChooseRepo = () => {
                   </div>
 
                   {submitError && <div className="repo-error">{submitError}</div>}
-                  {submitOk && <div className="repo-success">Submitted ✓</div>}
                 </div>
               )}
 

@@ -26,6 +26,28 @@
       "start_time": "2025-11-08T14:52:37.084215Z",
       "end_time": "2025-11-08T15:12:58.373103Z",
       "error_details": null
+    },
+    {
+      "id": "7362",
+      "base_nocode_bench_id": "psf__requests-5856"
+    },
+    {
+      "id": "e011",
+      "base_nocode_bench_id": "pytest-dev__pytest-2794"
+    },
+    {
+      "id": "1cf3",
+      "base_nocode_bench_id": "matplotlib__matplotlib-23525"
+    },
+    {
+      "id": "9c64",
+      "github_url": "https://github.com/hsuanlien/NoCode-bench_Frontend.git",
+      "doc_change": ""
+    },
+    {
+      "id": "06dc",
+      "github_url": "https://github.com/programiz/Calculator.git",
+      "doc_change": "Analyze the calculator code and add a new feature to support factorial calculations (x!). Please perform the following: 1. Add a new button labeled 'x!' to the GUI. 2. Implement the logic to calculate the factorial of the current number on the screen. 3. Ensure appropriate error handling (e.g., factorial is only defined for non-negative integers). 4. Use the `math` module if helpful."
     }
   ]
 }

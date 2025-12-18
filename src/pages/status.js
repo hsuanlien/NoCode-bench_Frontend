@@ -1,9 +1,12 @@
 // src/pages/status.js
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/NoCodeBench.css";
 
-const TASK_ID = 2; // 先寫死，之後可以從路由或 props 傳進來
+// const TASK_ID = 2; // 先寫死，需要改
+const API_BASE =
+  (process.env.REACT_APP_API_BASE ?? "").replace(/\/+$/, "") ||
+  "http://127.0.0.1:3001";
 
 // 很簡單的 unified diff renderer：用每一行的第一個字元決定顏色
 const DiffViewer = ({ patch }) => {
@@ -18,11 +21,11 @@ const DiffViewer = ({ patch }) => {
 
   const lines = patch.split("\n");
 
-  return (
+return (
     <div className="diff-viewer">
       <div className="diff-header">Generated patch</div>
       <div className="diff-code">
-        {lines.map((line, idx) => {
+        {patch.split("\n").map((line, idx) => {
           let type = "context";
           if (line.startsWith("diff --git")) type = "file";
           else if (line.startsWith("@@")) type = "hunk";
@@ -36,13 +39,10 @@ const DiffViewer = ({ patch }) => {
             type = "meta";
           }
 
-          const prefix = line[0] || " ";
-          const content = line.slice(1);
-
           return (
             <pre key={idx} className={`diff-line diff-${type}`}>
-              <span className="diff-prefix">{prefix}</span>
-              <span className="diff-text">{content}</span>
+              <span className="diff-prefix">{line[0] || " "}</span>
+              <span className="diff-text">{line.slice(1)}</span>
             </pre>
           );
         })}
@@ -50,38 +50,47 @@ const DiffViewer = ({ patch }) => {
     </div>
   );
 };
-
+/* ---------------- Status Page ---------------- */
 const StatusAnalytics = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const taskId =
+    location.state?.taskId || localStorage.getItem("nocode_last_task_id");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [task, setTask] = useState(null);
 
   useEffect(() => {
-    const fetchTask = async () => {
+        if (!taskId) {
+      setError("Missing task id. Please start a new evaluation.");
+      setLoading(false);
+      return;
+    }
+
+       const fetchTask = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const res = await fetch(
-          `http://localhost:3001/tasks/${TASK_ID}`
-        );// `http://127.0.0.1:3001/api/tasks/${TASK_ID}/`
+        const res = await fetch(`${API_BASE}/api/tasks/${taskId}/`);
         if (!res.ok) {
           throw new Error(`Request failed: ${res.status}`);
         }
+
         const data = await res.json();
         setTask(data);
       } catch (err) {
         console.error(err);
-        setError("Failed to load task status.");
+        setError("Failed to load task status from backend.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchTask();
-  }, []);
+  }, [taskId]);
 
   const result = task?.result || {};
   const generatedPatch = result.generated_patch || "";
