@@ -3,12 +3,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/NoCodeBench.css";
 
-// const TASK_ID = 2; // 先寫死，需要改
 const API_BASE =
   (process.env.REACT_APP_API_BASE ?? "").replace(/\/+$/, "") ||
   "http://127.0.0.1:3001";
 
-// 很簡單的 unified diff renderer：用每一行的第一個字元決定顏色
 const DiffViewer = ({ patch }) => {
   if (!patch || patch.trim() === "") {
     return (
@@ -121,7 +119,7 @@ const StatusAnalytics = () => {
           <p className="status-error">{error}</p>
         ) : (
           <div className="status-layout">
-            {/* 左邊：Patch / Repository overview */}
+            {/* left：Patch / Repository overview */}
             <section className="status-section">
               <h3 className="status-section-title">Code Modifications</h3>
 
@@ -152,11 +150,10 @@ const StatusAnalytics = () => {
                 </div>
               </div>
 
-              {/* 這裡就是 GitHub 風格 diff viewer */}
               <DiffViewer patch={generatedPatch} />
             </section>
 
-            {/* 右邊：Status Results / metrics */}
+            {/* right：Status Results / metrics */}
             <section className="status-section">
               <h3 className="status-section-title">Evaluation &amp; Quality Metrics</h3>
               <div className="status-block">

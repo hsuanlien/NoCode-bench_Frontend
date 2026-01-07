@@ -1,7 +1,6 @@
 /* NoCodeBench.css - Light theme, same layout */
 
 :root {
-  /* 背景改成淡淡的淺色漸層 */
   --nc-bg: radial-gradient(circle at 0% 0%, #e0f2fe 0, #f8fafc 55%, #e5e7eb 100%);
   --nc-primary: #6366f1;
   --nc-primary-soft: rgba(99, 102, 241, 0.2);
@@ -25,7 +24,6 @@ body {
   color: var(--nc-text);
 }
 
-/* 共用 page layout */
 .page {
   min-height: 100vh;
   padding: 2.5rem 1.75rem;
@@ -43,7 +41,6 @@ body {
   }
 }
 
-/* 背景光暈 - 改淺色 */
 .nebula {
   position: absolute;
   border-radius: 9999px;
@@ -68,7 +65,6 @@ body {
   right: -60px;
 }
 
-/* 通用玻璃卡片 - 深底改成白底卡片 */
 .glass-card {
   position: relative;
   z-index: 1;
@@ -593,7 +589,6 @@ message-success {
   border-style: dashed;
 }
 
-/* 右側詳細資訊 */
 .repo-detail {
   border-radius: 18px;
   border: 1px solid rgba(148, 163, 184, 0.5);
@@ -690,7 +685,6 @@ message-success {
   border-color: var(--nc-accent);
 }
 
-/* ===== Home：單欄式 hero，避免左右切一塊（保留原有樣式） ===== */
 
 .home-hero {
   display: flex;
@@ -817,7 +811,7 @@ message-success {
   color: var(--nc-text);
 }
 
-/* KPI 區塊 */
+/* KPI  */
 
 .status-kpis {
   display: grid;
@@ -869,7 +863,7 @@ message-success {
   color: var(--nc-muted);
 }
 
-/* Log 區塊 */
+/* Log */
 
 .status-log {
   margin-top: 0.4rem;
@@ -898,7 +892,7 @@ message-success {
   justify-content: flex-end;
 }
 
-/* ===== 全局：避免所有卡片自動左右分割 ===== */
+/* ===== Global: Prevent all cards from being automatically split horizontally.===== */
 
 .glass-card {
   display: flex;
@@ -908,7 +902,7 @@ message-success {
   margin-inline: auto;
 }
 
-/* 任何 hero layout 不再強制做 2 欄 */
+/* Any hero layout is no longer required to have two columns.*/
 .home-hero,
 .choose-repo-card,
 .single-repo-card,
@@ -925,8 +919,8 @@ message-success {
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.5);
   background: #f9fafb;
-  max-height: 420px;       /* 比較高的視窗 */
-  overflow: auto;          /* 超出就捲動，不要擠爆整個畫面 */
+  max-height: 420px;       
+  overflow: auto;          
 }
 
 .diff-header {
@@ -961,7 +955,6 @@ message-success {
   white-space: pre;        
 }
 
-/* 各種行別的底色風格 */
 .diff-file {
   background: #e5f0ff;
   font-weight: 500;
@@ -990,7 +983,6 @@ message-success {
   background: #f9fafb;
 }
 
-/* 左邊 + / - 的小欄位 */
 .diff-prefix {
   display: inline-block;
   width: 1ch;
@@ -1012,3 +1004,138 @@ message-success {
   flex: 1;
   color: #111827;
 }
+
+
+
+
+/* ===== Status page: lock layout to viewport ===== */
+
+.page.status-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+}
+
+.status-card {
+  height: calc(100vh - 64px); 
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-header {
+  flex: 0 0 auto;
+}
+.status-footer {
+  flex: 0 0 auto;
+}
+
+.status-layout {
+  flex: 1 1 auto;
+  min-height: 0; 
+  overflow: hidden;
+
+  display: grid;
+  grid-template-columns: 1.35fr 0.65fr;
+  gap: 18px;
+}
+
+.status-section {
+  min-height: 0; 
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.status-block {
+  flex: 0 0 auto;
+}
+
+.diff-viewer {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px; 
+}
+
+.diff-header {
+  flex: 0 0 auto;
+}
+
+.diff-code {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto; 
+}
+
+.status-log {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-log-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto; 
+}
+
+@media (max-width: 980px) {
+  .status-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+
+/* ===== Fix OVERALL STATUS overflow ===== */
+
+.status-kpi {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+
+  min-height: 0;
+}
+
+.status-kpi-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.status-kpi-value {
+  font-size: 13px;      
+  font-weight: 700;
+  line-height: 1.2;      
+  white-space: nowrap;   
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* （COMPLETED / PASSED） */
+.status-kpi-pass {
+  color: #2e7d32;
+}
+
+/* FAILED / ERROR */
+.status-kpi-fail {
+  color: #c62828;
+}
+
+.status-kpi-desc {
+  font-size: 12px;
+  line-height: 1.3;
+  opacity: 0.65;
+}
+
