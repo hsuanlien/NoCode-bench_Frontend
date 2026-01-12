@@ -1,70 +1,74 @@
-# Getting Started with Create React App
+## NoCode-bench — Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The NoCode-bench Frontend is a browser-based user interface for interacting with the NoCode-bench evaluation system.
+It enables users to define documentation-driven feature addition tasks, trigger automated evaluations, and inspect generated code patches and evaluation results through a unified web interface.
 
-## Available Scripts
+* Live Demo: [https://no-code-bench-frontend.vercel.app]
+* Deployment: Hosted on Vercel
+* Backend: Connected to the NoCode-bench evaluation API
+* Supported Tasks:
+  * Verified NoCode-bench benchmark tasks
+  * Custom feature requests on arbitrary GitHub repositories
 
-In the project directory, you can run:
+This frontend is designed to require no local setup or configuration. All interactions—from task specification to result inspection—are performed directly in the browser
 
-### `npm start`
+1. Platform Overview
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+NoCode-bench is a web-based evaluation platform for documentation-driven code changes.
+The frontend serves as the primary interaction layer, allowing users to:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* Specify a feature addition task using natural language
+* Trigger a fully automated evaluation workflow
+* Inspect generated code changes and evaluation outcomes
 
-### `npm test`
+From the user’s perspective, the system abstracts away repository cloning, code modification, and test execution. Users focus only on task definition and result interpretation, while all execution logic is handled by the backend.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. Typical User Flow (Quick Guide)
+Step 1: Home Page
+    Start from the landing page and click “Define a Feature Addition Task”.
 
-### `npm run build`
+Step 2: Choose Task Type
+Users can select one of two task specification modes:
+* Built-in Verified Tasks
+    - Choose from curated NoCode-bench benchmark instances derived from real-world documentation changes.
+    - No additional input is required.
+* Custom GitHub Repository
+    - Provide a GitHub repository URL.
+    - Describe the intended feature change in natural language.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Step 3: Run Evaluation
+* Click “Run Task Evaluation”.
+* The frontend submits the task to the backend.
+* Execution typically takes 10–20 minutes, depending on repository size and test complexity.
+* A loading view displays task status and elapsed time.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Step 4: View Results
+Once execution completes, users are redirected to the results page, where they can:
+Inspect the generated code patch (diff view)
+    - Green lines indicate added code
+    - Red lines indicate removed code
+Review evaluation outcomes and metrics based on test execution
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Step 5: Exit or Restart
+* Users may return to the home page to define and run another task.
 
-### `npm run eject`
+3. Project Structure Highlights
+src/
+├── pages/                # All major pages
+│   ├── home.js            # Landing page
+│   ├── chooseRepo.js      # Task specification (built-in & custom)
+│   ├── singleRepo.js      # Verified task selection & execution
+│   └── status.js          # Evaluation results & patch viewer
+│
+├── styles/
+│   ├── NoCodeBench.css    # Main styling
+│   └── App.css
+│
+├── App.js                 # Main routing setup
+├── index.js               # App entry point
+└── index.css
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+3. Notes & Limitations
+* Evaluation tasks may take 10–20 minutes depending on repository size and test complexity.
+* Results depend on the quality of existing tests in the target repository.
