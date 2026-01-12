@@ -70,9 +70,6 @@ Users can select one of the following task specification modes:
 - Execution typically takes **10–20 minutes**, depending on:
   - Repository size
   - Test suite complexity
-- A loading view displays:
-  - Current task status
-  - Elapsed execution time
 
 
 ### Step 4: View Results
@@ -80,8 +77,8 @@ Users can select one of the following task specification modes:
 Once execution completes, users are redirected to the results page, where they can:
 
 - Inspect the generated code patch (diff view)
-  - 🟢 Green lines indicate added code
-  - 🔴 Red lines indicate removed code
+  - Green lines indicate added code
+  - Red lines indicate removed code
 - Review evaluation outcomes and metrics based on test execution
 
 
@@ -90,11 +87,11 @@ Once execution completes, users are redirected to the results page, where they c
 - Users may return to the home page to define and run another task.
 
 
-## 3. Project Structure Highlights
+## 3. Project Structure 
 
 ```text
 src/
-├── pages/                 # Application pages
+├── pages/                  # Application pages
 │   ├── home.js             # Landing page
 │   ├── chooseRepo.js       # Task specification (verified & custom)
 │   ├── singleRepo.js       # Verified task selection & execution
